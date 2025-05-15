@@ -1,12 +1,13 @@
-pip install pyserial
-from serial_sender import enviar_comando
+import paho.mqtt.client as mqtt
+import json
 
-# Cambiar color LED RGB
-r, g, b = 255, 100, 180
-enviar_comando(f"COLOR {r:03} {g:03} {b:03}")
+broker = "broker.hivemq.com"
+port = 1883
+topic = "cami/centro/entretenimiento"
 
-# Encender buzzer
-enviar_comando("BUZZER_ON")
-
-# Mostrar texto en pantalla OLED
-enviar_comando("TEXT Inception Vol:80")
+def enviar_estado_a_wokwi(estado):
+    client = mqtt.Client()
+    client.connect(broker, port)
+    mensaje = json.dumps(estado)
+    client.publish(topic, mensaje)
+    client.disconnect()
