@@ -1,3 +1,4 @@
+import streamlit as st
 st.header("🎛️ Personalización manual")
 color = st.color_picker("Selecciona el color de las luces", st.session_state.luces)
 volumen = st.slider("Volumen", 0, 100, st.session_state.volumen)
