@@ -1,3 +1,4 @@
+import streamlit as st
 st.header("🎙️ Control por voz o texto")
 comando = st.text_input("Escribe un comando (ej: 'modo cine', 'poner música', 'encender luces'):")
 
