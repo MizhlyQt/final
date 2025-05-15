@@ -5,6 +5,20 @@ volumen = st.slider("Volumen", 0, 100, st.session_state.volumen)
 playlist = st.selectbox("Playlist", ["Jazz", "Pop", "Cine", "Rock"])
 pelicula = st.selectbox("Película", ["Inception", "Matrix", "Frozen", "Top Gun"])
 
+# Asegurar que las variables están inicializadas
+if 'modo' not in st.session_state:
+    st.session_state.modo = ""
+if 'luces' not in st.session_state:
+    st.session_state.luces = "#ffffff"
+if 'musica' not in st.session_state:
+    st.session_state.musica = False
+if 'volumen' not in st.session_state:
+    st.session_state.volumen = 50
+if 'pelicula' not in st.session_state:
+    st.session_state.pelicula = ""
+if 'playlist' not in st.session_state:
+    st.session_state.playlist = ""
+
 if st.button("Aplicar configuración"):
     st.session_state.luces = color
     st.session_state.volumen = volumen
