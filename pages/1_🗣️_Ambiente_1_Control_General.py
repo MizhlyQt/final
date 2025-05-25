@@ -1,28 +1,78 @@
 import streamlit as st
-st.header("🎙️ Control por voz o texto")
-comando = st.text_input("Escribe un comando (ej: 'modo cine', 'poner música', 'encender luces'):")
+from bokeh.models.widgets import Button
+from bokeh.models import CustomJS
+from streamlit_bokeh_events import streamlit_bokeh_events
+import paho.mqtt.publish as mqtt
 
-if st.button("Ejecutar comando"):
-    comando = comando.lower()
-    if "cine" in comando:
-        st.session_state.modo = "Modo Cine"
-        st.session_state.luces = "#222222"
-        st.session_state.musica = False
-        st.session_state.volumen = 80
-        st.session_state.pelicula = "Inception"
-    elif "luces" in comando:
-        st.session_state.luces = "#ffffff"
-    elif "música" in comando:
-        st.session_state.musica = True
-        st.session_state.playlist = "Pop"
+# Configuración MQTT
+MQTT_BROKER = "broker.mqttdashboard.com"
+MQTT_TOPIC = "casa_inteligente"
 
-# Mostrar estado actual
-def mostrar_estado():
-    st.markdown(f"**Modo actual:** {st.session_state.modo}")
-    st.markdown(f"**Color luces:** {st.session_state.luces}")
-    st.markdown(f"**Música activa:** {'Sí' if st.session_state.musica else 'No'}")
-    st.markdown(f"**Volumen:** {st.session_state.volumen}")
-    st.markdown(f"**Película:** {st.session_state.pelicula}")
-    st.markdown(f"**Playlist:** {st.session_state.playlist}")
+def enviar_comando(mensaje):
+    try:
+        mqtt.single(MQTT_TOPIC, mensaje.lower(), hostname=MQTT_BROKER)  # Envía en minúsculas
+        st.success(f"✅ Comando enviado: '{mensaje}'")
+    except Exception as e:
+        st.error(f"❌ Error al enviar: {str(e)}")
 
-st.divider()
+# Interfaz de usuario
+st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
+st.title("🏠 Control de Casa Inteligente")
+
+# Modo de control
+modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Texto"], horizontal=True, key="modo_control")
+
+if modo == "🎤 Voz":
+    st.subheader("Control por Voz")
+    st.write("Presiona el botón y di claramente:")
+    
+    voice_btn = Button(label=" 🎤 HABLAR AHORA ", width=300, button_type="success")
+    
+    voice_btn.js_on_event("button_click", CustomJS(code="""
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'es-ES';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        
+        recognition.onresult = function(e) {
+            const value = e.results[0][0].transcript;
+            document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
+        }
+        
+        recognition.start();
+    """))
+    
+    result = streamlit_bokeh_events(
+        voice_btn,
+        events="GET_TEXT",
+        key="voice_control",
+        refresh_on_update=False,
+        override_height=75,
+        debounce_time=0
+    )
+    
+    if result and "GET_TEXT" in result:
+        comando = result.get("GET_TEXT")
+        st.info(f"🎤 Comando detectado: '{comando}'")
+        enviar_comando(comando)
+
+else:
+    st.subheader("Control por Texto")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        dispositivo = st.selectbox("Dispositivo:", ["luces", "puerta"])
+    
+    with col2:
+        if dispositivo == "luces":
+            accion = st.radio("Acción:", ["enciende", "apaga"], horizontal=True)
+        else:
+            accion = st.radio("Acción:", ["abre", "cierra"], horizontal=True)
+    
+    if st.button("🚀 Enviar Comando", type="primary"):
+        comando = f"{accion} las {dispositivo}"
+        enviar_comando(comando)
+
+# Footer
+st.markdown("---")
+st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
