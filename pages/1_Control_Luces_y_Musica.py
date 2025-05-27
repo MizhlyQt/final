@@ -57,21 +57,18 @@ if modo == "🎤 Voz":
     )
     
     if result and "GET_TEXT" in result:
-        comando = str(result.get("GET_TEXT", ""))
-        comando_limpio = comando.lower().strip().replace(".", "").replace("!", "").replace("?", "")
+        comando = str(result.get("GET_TEXT", "")).lower().strip()
+        comando_limpio = comando.replace(".", "").replace("!", "").replace("?", "")
         
         st.info(f"🎤 Detectado: '{comando}'")
         
         # Diccionario de comandos aceptados con variaciones
         comandos_aceptados = {
-            # Comandos de luces
             "enciende las luces": "luces on",
             "prende las luces": "luces on",
             "activa las luces": "luces on",
             "apaga las luces": "luces off",
             "desactiva las luces": "luces off",
-            
-            # Comandos de música
             "play musica": "play",
             "reproduce musica": "play",
             "inicia musica": "play",
@@ -82,7 +79,6 @@ if modo == "🎤 Voz":
             "para musica": "stop"
         }
         
-        # Buscar coincidencia flexible
         comando_encontrado = None
         for clave in comandos_aceptados:
             if clave in comando_limpio:
