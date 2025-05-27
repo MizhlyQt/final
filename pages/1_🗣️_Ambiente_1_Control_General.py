@@ -4,7 +4,7 @@ from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 import paho.mqtt.publish as mqtt
 
-# Configuración MQTT (broker público)
+# Configuración MQTT
 MQTT_BROKER = "broker.mqttdashboard.com"
 MQTT_TOPIC = "casa_inteligente"
 
@@ -12,6 +12,7 @@ def enviar_comando(mensaje):
     """Envía comandos a Wokwi y muestra feedback en Streamlit"""
     try:
         mensaje = mensaje.lower().strip()
+        
         # Traduce comandos de voz a acciones específicas
         if "enciende" in mensaje and "luces" in mensaje:
             accion = "enciende las luces"
@@ -31,21 +32,21 @@ def enviar_comando(mensaje):
     except Exception as e:
         st.error(f"❌ Error al enviar: {str(e)}")
 
-# Interfaz de usuario
+# Configuración de la página
 st.set_page_config(page_title="Control por Voz", layout="centered")
 st.title("🎤 Control por Voz - Casa Inteligente")
 st.markdown("""
 **Instrucciones:**
-1. Haz clic en el botón **HABLAR**.
-2. Di claramente:  
-   - *"Enciende las luces"*  
-   - *"Apaga las luces"*  
-   - *"Abre la puerta"*  
+1. Haz clic en el botón **HABLAR**
+2. Di claramente:
+   - *"Enciende las luces"*
+   - *"Apaga las luces"*
+   - *"Abre la puerta"*
    - *"Cierra la puerta"*
 """)
 
 # Botón de voz con configuración optimizada
-voice_btn = Button(label=" 🎤 HABLAR ", width=200, button_type="success", css_classes=["voice-btn"])
+voice_btn = Button(label=" 🎤 HABLAR ", width=200, button_type="success")
 voice_btn.js_on_event("button_click", CustomJS(code="""
     const recognition = new webkitSpeechRecognition();
     recognition.lang = 'es-ES';
@@ -80,30 +81,17 @@ result = streamlit_bokeh_events(
     debounce_time=0
 )
 
-# Procesamiento de resultados
+# Procesamiento de resultados (VERSIÓN CORREGIDA)
 if result:
     if "GET_TEXT" in result:
-        comando = result.get("GET_TEXT")
-        st.info(f"🎤 Detectado: *'{comando}'*")
-        enviar_comando(comando)
-        
+        comando = str(result.get("GET_TEXT", "")).strip()  # Aseguramos que sea string
+        if comando:
+            st.info(f"🎤 Comando detectado: '{comando}'")
+            enviar_comando(comando)
+        else:
+            st.warning("No se capturó audio. Habla más claro o acerca el micrófono.")
+    
     elif "ERROR" in result:
-        error = result.get("ERROR")
-        st.error(f"🔇 Error de micrófono: {error}. Usa Chrome/Edge y permite acceso al micrófono.")
+        error = str(result.get("ERROR", "Error desconocido"))
+        st.error(f"🔇 Error de micrófono: {error}")
 
-# Estilos CSS personalizados
-st.markdown("""
-<style>
-.voice-btn {
-    background: #FF4B4B !important;
-    color: white !important;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 16px;
-}
-.voice-btn:hover {
-    background: #FF0000 !important;
-}
-</style>
-""", unsafe_allow_html=True)
