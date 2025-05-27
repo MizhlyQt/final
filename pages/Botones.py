@@ -46,31 +46,39 @@ if st.button('enciende las luces'):
 else:
     st.write('')
 
-if st.button('OFF'):
+if st.button('apaga las luces'):
     act1="OFF"
-    client1= paho.Client("GIT-HUB")                           
+    client1= paho.Client("casa_inteligente56")                           
     client1.on_publish = on_publish                          
     client1.connect(broker,port)  
     message =json.dumps({"Act1":act1})
-    ret= client1.publish("cmqtt_s", message)
+    ret= client1.publish("casa_inteligente","apaga las luces")
   
     
 else:
     st.write('')
 
-values = st.slider('Selecciona el rango de valores',0.0, 100.0)
-st.write('Values:', values)
 
-if st.button('Enviar valor analógico'):
-    client1= paho.Client("GIT-HUB")                           
+if st.button('reproducir la musica'):
+    act1="OFF"
+    client1= paho.Client("casa_inteligente56")                           
     client1.on_publish = on_publish                          
-    client1.connect(broker,port)   
-    message =json.dumps({"Analog": float(values)})
-    ret= client1.publish("cmqtt_a", message)
+    client1.connect(broker,port)  
+    message =json.dumps({"Act1":act1})
+    ret= client1.publish("casa_inteligente", " reproducir la musica")
+  
     
- 
 else:
     st.write('')
 
-
-
+if st.button('reproducir la musica'):
+    act1="OFF"
+    client1= paho.Client("casa_inteligente56")                           
+    client1.on_publish = on_publish                          
+    client1.connect(broker,port)  
+    message =json.dumps({"Act1":act1})
+    ret= client1.publish("casa_inteligente", " reproducir la musica")
+  
+    
+else:
+    st.write('')
