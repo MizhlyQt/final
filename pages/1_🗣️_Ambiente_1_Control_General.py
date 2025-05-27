@@ -4,75 +4,106 @@ from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 import paho.mqtt.publish as mqtt
 
-# Configuración MQTT
+# Configuración MQTT (broker público)
 MQTT_BROKER = "broker.mqttdashboard.com"
 MQTT_TOPIC = "casa_inteligente"
 
 def enviar_comando(mensaje):
+    """Envía comandos a Wokwi y muestra feedback en Streamlit"""
     try:
-        mqtt.single(MQTT_TOPIC, mensaje.lower(), hostname=MQTT_BROKER)  # Envía en minúsculas
-        st.success(f"✅ Comando enviado: '{mensaje}'")
+        mensaje = mensaje.lower().strip()
+        # Traduce comandos de voz a acciones específicas
+        if "enciende" in mensaje and "luces" in mensaje:
+            accion = "enciende las luces"
+        elif "apaga" in mensaje and "luces" in mensaje:
+            accion = "apaga las luces"
+        elif "abre" in mensaje and "puerta" in mensaje:
+            accion = "abre la puerta"
+        elif "cierra" in mensaje and "puerta" in mensaje:
+            accion = "cierra la puerta"
+        else:
+            st.warning("⚠️ Comando no reconocido. Di por ejemplo: 'Enciende las luces'")
+            return
+
+        mqtt.single(MQTT_TOPIC, accion, hostname=MQTT_BROKER)
+        st.success(f"✅ Comando ejecutado: {accion}")
+        
     except Exception as e:
         st.error(f"❌ Error al enviar: {str(e)}")
 
 # Interfaz de usuario
-st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
-st.title("🏠 Control de Casa Inteligente")
+st.set_page_config(page_title="Control por Voz", layout="centered")
+st.title("🎤 Control por Voz - Casa Inteligente")
+st.markdown("""
+**Instrucciones:**
+1. Haz clic en el botón **HABLAR**.
+2. Di claramente:  
+   - *"Enciende las luces"*  
+   - *"Apaga las luces"*  
+   - *"Abre la puerta"*  
+   - *"Cierra la puerta"*
+""")
 
-# Modo de control
-modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Texto"], horizontal=True, key="modo_control")
+# Botón de voz con configuración optimizada
+voice_btn = Button(label=" 🎤 HABLAR ", width=200, button_type="success", css_classes=["voice-btn"])
+voice_btn.js_on_event("button_click", CustomJS(code="""
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'es-ES';
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-if modo == "🎤 Voz":
-    st.subheader("Control por Voz")
-    st.write("Presiona el botón y di claramente:")
-    
-    voice_btn = Button(label=" 🎤 HABLAR AHORA ", width=300, button_type="success")
-    
-    voice_btn.js_on_event("button_click", CustomJS(code="""
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'es-ES';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        
-        recognition.onresult = function(e) {
-            const value = e.results[0][0].transcript;
+    recognition.onstart = function() {
+        document.dispatchEvent(new CustomEvent("START_LISTENING"));
+    };
+
+    recognition.onresult = function(e) {
+        const value = e.results[0][0].transcript;
+        if (value) {
             document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
         }
-        
-        recognition.start();
-    """))
-    
-    result = streamlit_bokeh_events(
-        voice_btn,
-        events="GET_TEXT",
-        key="voice_control",
-        refresh_on_update=False,
-        override_height=75,
-        debounce_time=0
-    )
-    
-    if result and "GET_TEXT" in result:
+    };
+
+    recognition.onerror = function(e) {
+        document.dispatchEvent(new CustomEvent("ERROR", {detail: e.error}));
+    };
+
+    recognition.start();
+"""))
+
+# Captura eventos del botón
+result = streamlit_bokeh_events(
+    voice_btn,
+    events=["GET_TEXT", "START_LISTENING", "ERROR"],
+    key="voice_control",
+    refresh_on_update=False,
+    override_height=75,
+    debounce_time=0
+)
+
+# Procesamiento de resultados
+if result:
+    if "GET_TEXT" in result:
         comando = result.get("GET_TEXT")
-        st.info(f"🎤 Comando detectado: '{comando}'")
+        st.info(f"🎤 Detectado: *'{comando}'*")
         enviar_comando(comando)
+        
+    elif "ERROR" in result:
+        error = result.get("ERROR")
+        st.error(f"🔇 Error de micrófono: {error}. Usa Chrome/Edge y permite acceso al micrófono.")
 
-else:
-    st.subheader("Control por Texto")
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        dispositivo = st.selectbox("Dispositivo:", ["luces", "puerta"])
-    
-    with col2:
-        if dispositivo == "luces":
-            accion = st.radio("Acción:", ["enciende", "apaga"], horizontal=True)
-        else:
-            accion = st.radio("Acción:", ["abre", "cierra"], horizontal=True)
-    
-    if st.button("🚀 Enviar Comando", type="primary"):
-        comando = f"{accion} las {dispositivo}"
-        enviar_comando(comando)
-
-# Footer
-st.markdown("---")
-st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
+# Estilos CSS personalizados
+st.markdown("""
+<style>
+.voice-btn {
+    background: #FF4B4B !important;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+.voice-btn:hover {
+    background: #FF0000 !important;
+}
+</style>
+""", unsafe_allow_html=True)
