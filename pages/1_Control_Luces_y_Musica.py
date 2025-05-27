@@ -1,4 +1,4 @@
-import streamlit as st 
+import streamlit as st
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
@@ -11,24 +11,25 @@ MQTT_TOPIC = "casa_inteligente"
 def enviar_comando(mensaje):
     """Envía comandos a Wokwi"""
     try:
-        mensaje = str(mensaje).lower().strip().replace(".", "").replace("!", "").replace("?", "")
+        mensaje = str(mensaje).lower().strip()
         mqtt.single(MQTT_TOPIC, mensaje, hostname=MQTT_BROKER)
         st.success(f"✅ Comando enviado: {mensaje}")
     except Exception as e:
         st.error(f"❌ Error al enviar: {str(e)}")
 
 # Configuración de la página
-st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
+st.set_page_config(page_title="Control de Música", layout="centered")
 st.title("🎵 Control de Música")
 
+# Instrucciones mejoradas con coincidencia flexible
 st.markdown("""
 **🗣️ Comandos de voz disponibles:**
-- "enciende las luces"
+- "enciende las luces" / "prende las luces"
 - "apaga las luces"
-- "play musica"
-- "stop musica"
+- "play música" / "reproduce música" / "inicia música"
+- "stop música" / "detén música" / "pausa música"
 
-*El sistema es sensible a mayúsculas y signos de puntuación.*
+*El sistema reconoce variaciones de estos comandos.*
 """)
 
 # Modo de control
@@ -61,24 +62,50 @@ if modo == "🎤 Voz":
         
         st.info(f"🎤 Detectado: '{comando}'")
         
-        comandos_aceptados = [
-            "enciende las luces",
-            "apaga las luces",
-            "play musica",
-            "stop musica"
-        ]
+        # Diccionario de comandos aceptados con variaciones
+        comandos_aceptados = {
+            # Comandos de luces
+            "enciende las luces": "luces on",
+            "prende las luces": "luces on",
+            "activa las luces": "luces on",
+            "apaga las luces": "luces off",
+            "desactiva las luces": "luces off",
+            
+            # Comandos de música
+            "play musica": "play",
+            "reproduce musica": "play",
+            "inicia musica": "play",
+            "comienza musica": "play",
+            "stop musica": "stop",
+            "deten musica": "stop",
+            "pausa musica": "stop",
+            "para musica": "stop"
+        }
         
-        if comando_limpio in comandos_aceptados:
-            enviar_comando(comando_limpio)
+        # Buscar coincidencia flexible
+        comando_encontrado = None
+        for clave in comandos_aceptados:
+            if clave in comando_limpio:
+                comando_encontrado = comandos_aceptados[clave]
+                break
+        
+        if comando_encontrado:
+            enviar_comando(comando_encontrado)
         else:
-            st.warning(f"Comando no reconocido. Prueba con uno de los siguientes:\n{comandos_aceptados}")
+            st.warning(f"""
+            Comando no reconocido. Prueba con:
+            - "enciende las luces"
+            - "apaga las luces"
+            - "play música"
+            - "stop música"
+            """)
 
 else:
     st.subheader("Control por Botones")
     col1, col2 = st.columns(2)
     
     with col1:
-        dispositivo = st.selectbox("Dispositivo:", ["luces", "musica"])
+        dispositivo = st.selectbox("Dispositivo:", ["luces", "música"])
     
     with col2:
         if dispositivo == "luces":
@@ -91,5 +118,6 @@ else:
     if st.button("🚀 Enviar Comando", type="primary"):
         enviar_comando(comando)
 
+# Footer
 st.markdown("---")
 st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
