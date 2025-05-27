@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st 
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
@@ -11,7 +11,6 @@ MQTT_TOPIC = "casa_inteligente"
 def enviar_comando(mensaje):
     """Envía comandos a Wokwi"""
     try:
-        # Limpieza más robusta del mensaje
         mensaje = str(mensaje).lower().strip().replace(".", "").replace("!", "").replace("?", "")
         mqtt.single(MQTT_TOPIC, mensaje, hostname=MQTT_BROKER)
         st.success(f"✅ Comando enviado: {mensaje}")
@@ -20,15 +19,14 @@ def enviar_comando(mensaje):
 
 # Configuración de la página
 st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
-st.title("🏠 Control de Casa Inteligente")
+st.title("🎵 Control de Música")
 
-# Instrucciones mejoradas
 st.markdown("""
-**🗣️ Comandos de voz que funcionan (di exactamente):**
+**🗣️ Comandos de voz disponibles:**
 - "enciende las luces"
 - "apaga las luces"
-- "abre la puerta"
-- "cierra la puerta"
+- "play musica"
+- "stop musica"
 
 *El sistema es sensible a mayúsculas y signos de puntuación.*
 """)
@@ -63,42 +61,35 @@ if modo == "🎤 Voz":
         
         st.info(f"🎤 Detectado: '{comando}'")
         
-        # Lista de comandos aceptados (en minúsculas y sin puntuación)
         comandos_aceptados = [
             "enciende las luces",
             "apaga las luces",
-            "abre la puerta",
-            "cierra la puerta"
+            "play musica",
+            "stop musica"
         ]
         
         if comando_limpio in comandos_aceptados:
             enviar_comando(comando_limpio)
         else:
-            st.warning(f"""
-            Comando no reconocido. Prueba con:
-            - "enciende las luces"
-            - "apaga las luces"
-            - "abre la puerta"
-            - "cierra la puerta"
-            """)
+            st.warning(f"Comando no reconocido. Prueba con uno de los siguientes:\n{comandos_aceptados}")
 
 else:
     st.subheader("Control por Botones")
     col1, col2 = st.columns(2)
     
     with col1:
-        dispositivo = st.selectbox("Dispositivo:", ["luces", "puerta"])
+        dispositivo = st.selectbox("Dispositivo:", ["luces", "musica"])
     
     with col2:
         if dispositivo == "luces":
             accion = st.radio("Acción:", ["enciende", "apaga"], horizontal=True)
+            comando = f"{accion} las luces"
         else:
-            accion = st.radio("Acción:", ["abre", "cierra"], horizontal=True)
+            accion = st.radio("Acción:", ["play", "stop"], horizontal=True)
+            comando = f"{accion} musica"
     
     if st.button("🚀 Enviar Comando", type="primary"):
-        comando = f"{accion} las {dispositivo}"
         enviar_comando(comando)
 
-# Footer
 st.markdown("---")
 st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
