@@ -3,8 +3,6 @@ from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 import paho.mqtt.publish as mqtt
-import unicodedata
-import re
 
 # Configuración MQTT
 MQTT_BROKER = "broker.mqttdashboard.com"
@@ -13,33 +11,28 @@ MQTT_TOPIC = "casa_inteligente"
 def enviar_comando(mensaje):
     """Envía comandos a Wokwi"""
     try:
+        # Conversión robusta a minúsculas y limpieza
         mensaje = str(mensaje).lower().strip()
+        # Eliminar puntos, signos de exclamación, etc.
+        mensaje = ''.join(c for c in mensaje if c.isalpha() or c.isspace())
         mqtt.single(MQTT_TOPIC, mensaje, hostname=MQTT_BROKER)
         st.success(f"✅ Comando enviado: {mensaje}")
     except Exception as e:
         st.error(f"❌ Error al enviar: {str(e)}")
 
-# Función para limpiar texto: elimina tildes y puntuación
-def limpiar_comando(texto):
-    texto = texto.lower().strip()
-    texto = ''.join(c for c in unicodedata.normalize('NFD', texto)
-                    if unicodedata.category(c) != 'Mn')  # Elimina tildes
-    texto = re.sub(r'[^\w\s]', '', texto)  # Elimina puntuación
-    return texto
-
 # Configuración de la página
 st.set_page_config(page_title="Control de Música", layout="centered")
 st.title("🎵 Control de Música")
 
-# Instrucciones mejoradas con coincidencia flexible
+# Instrucciones mejoradas
 st.markdown("""
-**🗣️ Comandos de voz disponibles:**
-- "enciende las luces" / "prende las luces"
-- "apaga las luces"
-- "play música" / "reproduce música" / "inicia música"
-- "stop música" / "detén música" / "pausa música"
+**🗣️ Comandos de voz que funcionan:**
+- "play musica" (o "reproduce música")
+- "stop musica" (o "pausa música")
+- "enciende luces"
+- "apaga luces"
 
-*El sistema reconoce variaciones de estos comandos.*
+*Di el comando naturalmente, el sistema entenderá aunque uses mayúsculas.*
 """)
 
 # Modo de control
@@ -47,14 +40,14 @@ modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Botones"], horizontal=T
 
 if modo == "🎤 Voz":
     st.subheader("Control por Voz")
-    st.write("Presiona el botón y di claramente uno de los comandos:")
+    st.write("Presiona el botón y di el comando:")
     
     voice_btn = Button(label=" 🎤 HABLAR AHORA ", width=300, button_type="success")
     voice_btn.js_on_event("button_click", CustomJS(code="""
         const recognition = new webkitSpeechRecognition();
         recognition.lang = 'es-ES';
         recognition.onresult = function(e) {
-            const value = String(e.results[0][0].transcript || '');
+            const value = String(e.results[0][0].transcript || '').toLowerCase();
             document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
         }
         recognition.start();
@@ -67,62 +60,61 @@ if modo == "🎤 Voz":
     )
     
     if result and "GET_TEXT" in result:
-        comando = str(result.get("GET_TEXT", "")).strip()
-        comando_limpio = limpiar_comando(comando)
+        comando_recibido = str(result.get("GET_TEXT", ""))
+        # Limpieza adicional
+        comando = comando_recibido.lower().strip()
+        comando = ' '.join(comando.split())  # Elimina espacios múltiples
         
-        st.info(f"🎤 Detectado: '{comando}'")
+        st.info(f"🎤 Detectado: '{comando_recibido}'")
         
-        # Diccionario de comandos aceptados con variaciones
-        comandos_aceptados = {
-            # Comandos de luces
-            "enciende las luces": "luces on",
-            "prende las luces": "luces on",
-            "activa las luces": "luces on",
-            "apaga las luces": "luces off",
-            "desactiva las luces": "luces off",
-            
+        # Diccionario de coincidencias flexibles
+        comandos = {
             # Comandos de música
             "play musica": "play",
             "reproduce musica": "play",
             "inicia musica": "play",
-            "comienza musica": "play",
+            "para musica": "stop",
             "stop musica": "stop",
-            "deten musica": "stop",
             "pausa musica": "stop",
-            "para musica": "stop"
+            
+            # Comandos de luces
+            "enciende luces": "luces on",
+            "prende luces": "luces on",
+            "apaga luces": "luces off"
         }
         
-        # Buscar coincidencia flexible
-        comando_encontrado = None
-        for clave in comandos_aceptados:
-            if clave in comando_limpio:
-                comando_encontrado = comandos_aceptados[clave]
+        # Buscar la mejor coincidencia
+        comando_enviar = None
+        for clave in comandos:
+            if clave in comando:
+                comando_enviar = comandos[clave]
                 break
         
-        if comando_encontrado:
-            enviar_comando(comando_encontrado)
+        if comando_enviar:
+            enviar_comando(comando_enviar)
         else:
-            st.warning(f"""
+            st.warning("""
             Comando no reconocido. Prueba con:
-            - "enciende las luces"
-            - "apaga las luces"
-            - "play música"
-            - "stop música"
+            - "play musica" o "reproduce música"
+            - "stop musica" o "pausa música"
+            - "enciende luces"
+            - "apaga luces"
             """)
+
 else:
     st.subheader("Control por Botones")
     col1, col2 = st.columns(2)
     
     with col1:
-        dispositivo = st.selectbox("Dispositivo:", ["luces", "música"])
+        dispositivo = st.selectbox("Controlar:", ["música", "luces"])
     
     with col2:
-        if dispositivo == "luces":
-            accion = st.radio("Acción:", ["enciende", "apaga"], horizontal=True)
-            comando = f"{accion} las luces"
-        else:
-            accion = st.radio("Acción:", ["play", "stop"], horizontal=True)
+        if dispositivo == "música":
+            accion = st.radio("Acción música:", ["play", "stop"], horizontal=True)
             comando = f"{accion} musica"
+        else:
+            accion = st.radio("Acción luces:", ["enciende", "apaga"], horizontal=True)
+            comando = f"{accion} luces"
     
     if st.button("🚀 Enviar Comando", type="primary"):
         enviar_comando(comando)
@@ -130,7 +122,6 @@ else:
 # Footer
 st.markdown("---")
 st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
-
 # Footer
 st.markdown("---")
 st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
