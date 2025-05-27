@@ -71,14 +71,4 @@ if st.button('reproducir la musica'):
 else:
     st.write('')
 
-if st.button('reproducir la musica'):
-    act1="OFF"
-    client1= paho.Client("casa_inteligente56")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)  
-    message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente", " reproducir la musica")
-  
-    
-else:
-    st.write('')
+
