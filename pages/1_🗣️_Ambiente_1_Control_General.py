@@ -21,40 +21,30 @@ def enviar_comando(mensaje):
 st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
 st.title("🏠 Control de Casa Inteligente")
 
-# Modo de control
-modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Texto"], horizontal=True, key="modo_control")
+# Modo de control - Manteniendo ambos sistemas
+modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Botones"], horizontal=True, key="modo_control")
 
 if modo == "🎤 Voz":
     st.subheader("Control por Voz")
     st.write("Presiona el botón y di claramente:")
     
-    # Botón de voz optimizado
+    # Botón de voz simplificado (sin parámetros problemáticos)
     voice_btn = Button(label=" 🎤 HABLAR AHORA ", width=300, button_type="success")
     voice_btn.js_on_event("button_click", CustomJS(code="""
         const recognition = new webkitSpeechRecognition();
         recognition.lang = 'es-ES';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        
         recognition.onresult = function(e) {
             const value = String(e.results[0][0].transcript || '');
-            if (value) {
-                document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
-            }
+            document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
         }
-        
-        recognition.onerror = function(e) {
-            console.error("Error de voz:", e.error);
-        }
-        
         recognition.start();
     """))
     
+    # Configuración mínima de eventos
     result = streamlit_bokeh_events(
         voice_btn,
         events="GET_TEXT",
-        key="voice_control",
-        override_height=75
+        key="voice_control"
     )
     
     if result and "GET_TEXT" in result:
@@ -74,7 +64,7 @@ if modo == "🎤 Voz":
                 st.warning("Comando no reconocido")
 
 else:
-    st.subheader("Control por Texto")
+    st.subheader("Control por Botones")
     col1, col2 = st.columns(2)
     
     with col1:
