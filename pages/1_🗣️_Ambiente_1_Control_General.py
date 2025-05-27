@@ -21,6 +21,16 @@ def enviar_comando(mensaje):
 st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
 st.title("🏠 Control de Casa Inteligente")
 
+st.markdown("""
+**🗣️ Comandos de voz exactos que funcionan:**
+- *"enciende las luces"*
+- *"apaga las luces"*
+- *"abre la puerta"*
+- *"cierra la puerta"*
+
+*Nota: Debes decir los comandos exactamente como se muestran para que funcionen.*
+""")
+
 # Modo de control - Manteniendo ambos sistemas
 modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Botones"], horizontal=True, key="modo_control")
 
