@@ -1,4 +1,6 @@
-streamlit>=1.0.0
-bokeh>=2.0.0
-streamlit-bokeh-events>=0.1.0
-paho-mqtt>=1.6.1
+# requirements.txt (versiones probadas y estables)
+streamlit==1.32.2
+bokeh==2.4.3
+streamlit-bokeh-events==0.1.0
+paho-mqtt==1.6.1
+Jinja2==3.1.2  # Requerido por Bokeh
