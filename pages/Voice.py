@@ -9,7 +9,7 @@ import glob
 import paho.mqtt.client as paho
 import json
 from gtts import gTTS
-from googletrans import Translator
+#from googletrans import Translator
 
 def on_publish(client,userdata,result):             #create function for callback
     print("el dato ha sido publicado \n")
