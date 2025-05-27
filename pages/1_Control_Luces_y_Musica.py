@@ -3,6 +3,8 @@ from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 import paho.mqtt.publish as mqtt
+import unicodedata
+import re
 
 # Configuración MQTT
 MQTT_BROKER = "broker.mqttdashboard.com"
@@ -16,6 +18,14 @@ def enviar_comando(mensaje):
         st.success(f"✅ Comando enviado: {mensaje}")
     except Exception as e:
         st.error(f"❌ Error al enviar: {str(e)}")
+
+# Función para limpiar texto: elimina tildes y puntuación
+def limpiar_comando(texto):
+    texto = texto.lower().strip()
+    texto = ''.join(c for c in unicodedata.normalize('NFD', texto)
+                    if unicodedata.category(c) != 'Mn')  # Elimina tildes
+    texto = re.sub(r'[^\w\s]', '', texto)  # Elimina puntuación
+    return texto
 
 # Configuración de la página
 st.set_page_config(page_title="Control de Música", layout="centered")
@@ -57,18 +67,21 @@ if modo == "🎤 Voz":
     )
     
     if result and "GET_TEXT" in result:
-        comando = str(result.get("GET_TEXT", "")).lower().strip()
-        comando_limpio = comando.replace(".", "").replace("!", "").replace("?", "")
+        comando = str(result.get("GET_TEXT", "")).strip()
+        comando_limpio = limpiar_comando(comando)
         
         st.info(f"🎤 Detectado: '{comando}'")
         
         # Diccionario de comandos aceptados con variaciones
         comandos_aceptados = {
+            # Comandos de luces
             "enciende las luces": "luces on",
             "prende las luces": "luces on",
             "activa las luces": "luces on",
             "apaga las luces": "luces off",
             "desactiva las luces": "luces off",
+            
+            # Comandos de música
             "play musica": "play",
             "reproduce musica": "play",
             "inicia musica": "play",
@@ -79,6 +92,7 @@ if modo == "🎤 Voz":
             "para musica": "stop"
         }
         
+        # Buscar coincidencia flexible
         comando_encontrado = None
         for clave in comandos_aceptados:
             if clave in comando_limpio:
@@ -95,7 +109,6 @@ if modo == "🎤 Voz":
             - "play música"
             - "stop música"
             """)
-
 else:
     st.subheader("Control por Botones")
     col1, col2 = st.columns(2)
@@ -113,6 +126,10 @@ else:
     
     if st.button("🚀 Enviar Comando", type="primary"):
         enviar_comando(comando)
+
+# Footer
+st.markdown("---")
+st.caption(f"🔗 Conectado a: {MQTT_BROKER} | 📡 Topic: {MQTT_TOPIC}")
 
 # Footer
 st.markdown("---")
