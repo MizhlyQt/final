@@ -11,7 +11,8 @@ MQTT_TOPIC = "casa_inteligente"
 def enviar_comando(mensaje):
     """Envía comandos a Wokwi"""
     try:
-        mensaje = str(mensaje).lower().strip()
+        # Limpieza más robusta del mensaje
+        mensaje = str(mensaje).lower().strip().replace(".", "").replace("!", "").replace("?", "")
         mqtt.single(MQTT_TOPIC, mensaje, hostname=MQTT_BROKER)
         st.success(f"✅ Comando enviado: {mensaje}")
     except Exception as e:
@@ -21,24 +22,24 @@ def enviar_comando(mensaje):
 st.set_page_config(page_title="Control Casa Inteligente", layout="centered")
 st.title("🏠 Control de Casa Inteligente")
 
+# Instrucciones mejoradas
 st.markdown("""
-**🗣️ Comandos de voz exactos que funcionan:**
-- *"enciende las luces"*
-- *"apaga las luces"*
-- *"abre la puerta"*
-- *"cierra la puerta"*
+**🗣️ Comandos de voz que funcionan (di exactamente):**
+- "enciende las luces"
+- "apaga las luces"
+- "abre la puerta"
+- "cierra la puerta"
 
-*Nota: Debes decir los comandos exactamente como se muestran para que funcionen.*
+*El sistema es sensible a mayúsculas y signos de puntuación.*
 """)
 
-# Modo de control - Manteniendo ambos sistemas
+# Modo de control
 modo = st.radio("Modo de control:", ["🎤 Voz", "⌨️ Botones"], horizontal=True, key="modo_control")
 
 if modo == "🎤 Voz":
     st.subheader("Control por Voz")
-    st.write("Presiona el botón y di claramente:")
+    st.write("Presiona el botón y di claramente uno de los comandos:")
     
-    # Botón de voz simplificado (sin parámetros problemáticos)
     voice_btn = Button(label=" 🎤 HABLAR AHORA ", width=300, button_type="success")
     voice_btn.js_on_event("button_click", CustomJS(code="""
         const recognition = new webkitSpeechRecognition();
@@ -50,7 +51,6 @@ if modo == "🎤 Voz":
         recognition.start();
     """))
     
-    # Configuración mínima de eventos
     result = streamlit_bokeh_events(
         voice_btn,
         events="GET_TEXT",
@@ -58,20 +58,29 @@ if modo == "🎤 Voz":
     )
     
     if result and "GET_TEXT" in result:
-        comando = str(result.get("GET_TEXT", "")).strip()
-        if comando:
-            st.info(f"🎤 Comando detectado: '{comando}'")
-            # Traducción de comandos de voz
-            if "enciende" in comando and "luces" in comando:
-                enviar_comando("enciende las luces")
-            elif "apaga" in comando and "luces" in comando:
-                enviar_comando("apaga las luces")
-            elif "abre" in comando and "puerta" in comando:
-                enviar_comando("abre la puerta")
-            elif "cierra" in comando and "puerta" in comando:
-                enviar_comando("cierra la puerta")
-            else:
-                st.warning("Comando no reconocido")
+        comando = str(result.get("GET_TEXT", ""))
+        comando_limpio = comando.lower().strip().replace(".", "").replace("!", "").replace("?", "")
+        
+        st.info(f"🎤 Detectado: '{comando}'")
+        
+        # Lista de comandos aceptados (en minúsculas y sin puntuación)
+        comandos_aceptados = [
+            "enciende las luces",
+            "apaga las luces",
+            "abre la puerta",
+            "cierra la puerta"
+        ]
+        
+        if comando_limpio in comandos_aceptados:
+            enviar_comando(comando_limpio)
+        else:
+            st.warning(f"""
+            Comando no reconocido. Prueba con:
+            - "enciende las luces"
+            - "apaga las luces"
+            - "abre la puerta"
+            - "cierra la puerta"
+            """)
 
 else:
     st.subheader("Control por Botones")
