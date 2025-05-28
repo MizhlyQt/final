@@ -65,7 +65,7 @@ if st.button('reproducir la musica'):
     client1.on_publish = on_publish                          
     client1.connect(broker,port)  
     message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente", " reproducir la musica")
+    ret= client1.publish("casa_inteligente", "reproducir la musica")
   
     
 else:
