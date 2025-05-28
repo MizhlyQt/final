@@ -75,7 +75,7 @@ if result:
         client1.on_publish = on_publish                            
         client1.connect(broker,port)  
         message =json.dumps({"Act1":result.get("GET_TEXT").strip()})
-        ret= client1.publish("casa_inteligente", message)
+        ret= client1.publish("casa_inteligente", result.get("GET_TEXT").strip())
 
     
     try:
