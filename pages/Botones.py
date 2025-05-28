@@ -32,13 +32,13 @@ client1.on_message = on_message
 
 st.title("MQTT Control")
 
-if st.button('enciende las luces'):
+if st.button('enciende Las luces'):
     act1="ON"
     client1= paho.Client("casa_inteligente56")                           
     client1.on_publish = on_publish                          
     client1.connect(broker,port)  
     message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente", "enciende las luces")
+    ret= client1.publish("casa_inteligente", "enciende Las luces")
  
     #client1.subscribe("Sensores")
     
@@ -46,26 +46,26 @@ if st.button('enciende las luces'):
 else:
     st.write('')
 
-if st.button('apaga las luces'):
+if st.button('apaga Las luces'):
     act1="OFF"
     client1= paho.Client("casa_inteligente56")                           
     client1.on_publish = on_publish                          
     client1.connect(broker,port)  
     message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente","apaga las luces")
+    ret= client1.publish("casa_inteligente","apaga Las luces")
   
     
 else:
     st.write('')
 
 
-if st.button('reproducir La Musica'):
+if st.button('escuchar La Musica'):
     act1="OFF"
     client1= paho.Client("casa_inteligente56")                           
     client1.on_publish = on_publish                          
     client1.connect(broker,port)  
     message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente", "reproducir La Musica")
+    ret= client1.publish("casa_inteligente", "escuchar La Musica")
   
     
 else:
