@@ -4,71 +4,70 @@ import streamlit as st
 import json
 import platform
 
-# Muestra la versión de Python junto con detalles adicionales
-st.write("Versión de Python:", platform.python_version())
+# Estilos básicos
+st.set_page_config(page_title="Control MQTT", page_icon="💡", layout="centered")
 
+# Encabezado elegante
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Panel de Control MQTT 🏠</h1>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center;'>Versión de Python: <b>{platform.python_version()}</b></p>", unsafe_allow_html=True)
+st.markdown("---")
+
+# Variables
 values = 0.0
-act1="OFF"
+act1 = "OFF"
 
-def on_publish(client,userdata,result):             #create function for callback
+# Callbacks MQTT
+def on_publish(client, userdata, result):
     print("el dato ha sido publicado \n")
     pass
 
 def on_message(client, userdata, message):
     global message_received
     time.sleep(2)
-    message_received=str(message.payload.decode("utf-8"))
-    st.write(message_received)
+    message_received = str(message.payload.decode("utf-8"))
+    st.success(f"Mensaje recibido: {message_received}")
 
-        
-
-
-broker="broker.mqttdashboard.com"
-port=1883
-client1= paho.Client("GIT-HUB")
+# Configuración del broker
+broker = "broker.mqttdashboard.com"
+port = 1883
+client1 = paho.Client("GIT-HUB")
 client1.on_message = on_message
 
+# Contenedor de botones
+with st.container():
+    col1, col2, col3 = st.columns(3)
 
+    with col1:
+        if st.button('💡 Encender luces'):
+            act1 = "ON"
+            client1 = paho.Client("casa_inteligente56")                           
+            client1.on_publish = on_publish                          
+            client1.connect(broker, port)  
+            message = json.dumps({"Act1": act1})
+            ret = client1.publish("casa_inteligente", "enciende Las luces")
+        else:
+            st.write("")
 
-st.title("MQTT Control")
+    with col2:
+        if st.button('🔌 Apagar luces'):
+            act1 = "OFF"
+            client1 = paho.Client("casa_inteligente56")                           
+            client1.on_publish = on_publish                          
+            client1.connect(broker, port)  
+            message = json.dumps({"Act1": act1})
+            ret = client1.publish("casa_inteligente", "apaga Las luces")
+        else:
+            st.write("")
 
-if st.button('enciende Las luces'):
-    act1="ON"
-    client1= paho.Client("casa_inteligente56")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)  
-    message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente", "enciende Las luces")
- 
-    #client1.subscribe("Sensores")
-    
-    
-else:
-    st.write('')
-
-if st.button('apaga Las luces'):
-    act1="OFF"
-    client1= paho.Client("casa_inteligente56")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)  
-    message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente","apaga Las luces")
-  
-    
-else:
-    st.write('')
-
-
-if st.button('escuchar La Musica'):
-    act1="OFF"
-    client1= paho.Client("casa_inteligente56")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)  
-    message =json.dumps({"Act1":act1})
-    ret= client1.publish("casa_inteligente", "escuchar La Musica")
-  
-    
-else:
-    st.write('')
+    with col3:
+        if st.button('🎵 Escuchar música'):
+            act1 = "OFF"
+            client1 = paho.Client("casa_inteligente56")                           
+            client1.on_publish = on_publish                          
+            client1.connect(broker, port)  
+            message = json.dumps({"Act1": act1})
+            ret = client1.publish("casa_inteligente", "escuchar La Musica")
+        else:
+            st.write("")
 
 
