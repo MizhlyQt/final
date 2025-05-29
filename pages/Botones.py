@@ -4,12 +4,16 @@ import streamlit as st
 import json
 import platform
 
-# Estilos básicos
+
 st.set_page_config(page_title="Control MQTT", page_icon="💡", layout="centered")
 
-# Encabezado elegante
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Panel de Control MQTT 🏠</h1>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align: center;'>Versión de Python: <b>{platform.python_version()}</b></p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Panel de Control del centro multimedial 🏠</h1>", unsafe_allow_html=True)
+st.markdown(
+    "<p style='text-align: center; font-size: 16px;'>"
+    "En esta parte puedes controlar a través de botones las interacciones del centro multimedia."
+    "</p>",
+    unsafe_allow_html=True
+)
 st.markdown("---")
 
 # Variables
@@ -48,7 +52,7 @@ with st.container():
             st.success("Comando enviado: Encender luces")
         else:
             st.write("")
-        st.image("https://cdn-icons-png.flaticon.com/512/4280/4280670.png", caption="Luces encendidas", width=100)
+        st.image("https://png.pngtree.com/png-vector/20220903/ourmid/pngtree-shining-bright-light-bulb-png-image_6136095.png", caption="Luces encendidas", width=100)
 
     with col2:
         if st.button('🔌 Apagar luces'):
@@ -61,7 +65,7 @@ with st.container():
             st.success("Comando enviado: Apagar luces")
         else:
             st.write("")
-        st.image("https://cdn-icons-png.flaticon.com/512/1828/1828665.png", caption="Luces apagadas", width=100)
+        st.image("https://png.pngtree.com/png-clipart/20201216/original/pngtree-flat-light-bulb-turn-off-isolated-vector-png-image_5692256.jpg", caption="Luces apagadas", width=100)
 
     with col3:
         if st.button('🎵 Escuchar música'):
@@ -75,6 +79,6 @@ with st.container():
 
         else:
             st.write("")
-        st.image("https://cdn-icons-png.flaticon.com/512/727/727245.png", caption="Reproducir música", width=100)
+        st.image(https://img.lovepik.com/png/20231116/boombox-sticker-design-with-a-gif-image-vector-clipart-cartoon_612038_wh860.png", caption="Reproducir música", width=100)
 
 
