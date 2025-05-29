@@ -12,7 +12,7 @@ def enviar_valor_bar_graph(valor):
         st.error(f"❌ Error: {str(e)}")
 
 st.set_page_config(page_title="Control LED Bar Graph", layout="centered")
-st.title("Control de Temperatura 🔥❄️")
+st.title("Control de Luz de Proyector📽️")
 
 page_style = """
 <style>
