@@ -48,6 +48,7 @@ with st.container():
             st.success("Comando enviado: Encender luces")
         else:
             st.write("")
+        st.image("https://cdn-icons-png.flaticon.com/512/4280/4280670.png", caption="Luces encendidas", width=100)
 
     with col2:
         if st.button('🔌 Apagar luces'):
@@ -60,6 +61,7 @@ with st.container():
             st.success("Comando enviado: Apagar luces")
         else:
             st.write("")
+        st.image("https://cdn-icons-png.flaticon.com/512/1828/1828665.png", caption="Luces apagadas", width=100)
 
     with col3:
         if st.button('🎵 Escuchar música'):
@@ -73,5 +75,6 @@ with st.container():
 
         else:
             st.write("")
+        st.image("https://cdn-icons-png.flaticon.com/512/727/727245.png", caption="Reproducir música", width=100)
 
 
