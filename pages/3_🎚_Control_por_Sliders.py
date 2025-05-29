@@ -18,17 +18,17 @@ page_style = """
 <style>
 /* Fondo principal */
 [data-testid="stAppViewContainer"] {
-    background-color: #8cbfc2;
+    background-color: #010f1c;
 }
 
 /* Fondo del sidebar */
 [data-testid="stSidebar"] {
-    background-color: #9e6449;
+    background-color: #0a1f30;
 }
 
 /* Color de todos los textos */
 [data-testid="stMarkdownContainer"] {
-    color: #000000;
+    color: #ffffff;
 }
 </style>
 """
