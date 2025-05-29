@@ -12,7 +12,28 @@ def enviar_valor_bar_graph(valor):
         st.error(f"❌ Error: {str(e)}")
 
 st.set_page_config(page_title="Control LED Bar Graph", layout="centered")
-st.title("📊 Control LED Bar Graph (10 segmentos)")
+st.title("Control de Temperatura 🔥❄️")
+
+page_style = """
+<style>
+/* Fondo principal */
+[data-testid="stAppViewContainer"] {
+    background-color: ##8cbfc2;
+}
+
+/* Fondo del sidebar */
+[data-testid="stSidebar"] {
+    background-color: ##9e6449;
+}
+
+/* Color de todos los textos */
+[data-testid="stMarkdownContainer"] {
+    color: #000000;
+}
+</style>
+"""
+
+st.markdown(page_style, unsafe_allow_html=True)
 
 valor = st.slider(
     "Nivel de intensidad:",
@@ -29,4 +50,4 @@ if st.button("Enviar", type="primary"):
 # Simulación visual
 st.write("---")
 st.subheader("Simulación")
-st.write(f"🔵 LEDs encendidos: **{valor // 10}** de 10")
+st.write(f"💡💡 LEDs encendidos: **{valor // 10}** de 10")
