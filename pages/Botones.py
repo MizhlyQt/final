@@ -45,6 +45,7 @@ with st.container():
             client1.connect(broker, port)  
             message = json.dumps({"Act1": act1})
             ret = client1.publish("casa_inteligente", "enciende Las luces")
+            st.success("Comando enviado: Encender luces")
         else:
             st.write("")
 
@@ -56,6 +57,7 @@ with st.container():
             client1.connect(broker, port)  
             message = json.dumps({"Act1": act1})
             ret = client1.publish("casa_inteligente", "apaga Las luces")
+            st.success("Comando enviado: Apagar luces")
         else:
             st.write("")
 
@@ -67,6 +69,8 @@ with st.container():
             client1.connect(broker, port)  
             message = json.dumps({"Act1": act1})
             ret = client1.publish("casa_inteligente", "escuchar La Musica")
+            st.success("Comando enviado: Reproducir música")
+
         else:
             st.write("")
 
