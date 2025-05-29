@@ -79,6 +79,6 @@ with st.container():
 
         else:
             st.write("")
-        st.image("https://img.lovepik.com/png/20231116/boombox-sticker-design-with-a-gif-image-vector-clipart-cartoon_612038_wh860.png", caption="Reproducir música", width=100)
+        st.image("https://cpng.pikpng.com/pngl/s/448-4485000_recorder-boombox-videocassette-transprent-png-free-illustration-clipart.png", caption="Reproducir música", width=100)
 
 
