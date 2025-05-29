@@ -47,7 +47,6 @@ valor = st.slider(
 if st.button("Enviar", type="primary"):
     enviar_valor_bar_graph(valor)
 
-# Simulación visual
 st.write("---")
 st.subheader("Simulación")
 st.write(f"💡💡 LEDs encendidos: **{valor // 10}** de 10")
