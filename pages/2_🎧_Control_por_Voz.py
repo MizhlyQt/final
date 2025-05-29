@@ -24,6 +24,27 @@ port = 1883
 client1 = paho.Client("casa_inteligente56")
 client1.on_message = on_message
 
+page_style = """
+<style>
+/* Fondo principal */
+[data-testid="stAppViewContainer"] {
+    background-color: #1b3d1e;
+}
+
+/* Fondo del sidebar */
+[data-testid="stSidebar"] {
+    background-color: #38633c;
+}
+
+/* Color de todos los textos */
+[data-testid="stMarkdownContainer"] {
+    color: #000000;
+}
+</style>
+"""
+
+st.markdown(page_style, unsafe_allow_html=True)
+
 # Título principal
 st.title("INTERFACES MULTIMODALES")
 st.subheader("CONTROL POR VOZ")
