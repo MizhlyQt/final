@@ -20,12 +20,12 @@ page_style = """
 <style>
 /* Fondo principal */
 [data-testid="stAppViewContainer"] {
-    background-color: ##360f0f;
+    background-color: #360f0f;
 }
 
 /* Fondo del sidebar */
 [data-testid="stSidebar"] {
-    background-color: ##1c0101;
+    background-color: #1c0101;
 }
 
 /* Color de todos los textos */
