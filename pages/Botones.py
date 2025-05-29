@@ -7,7 +7,7 @@ from PIL import Image
 
 st.set_page_config(page_title="Control MQTT", page_icon="💡", layout="centered")
 
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Panel de Control del centro multimedial 🎞 </h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Panel de Control del centro multimedial 🎭 </h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size: 16px;'>"
     "En esta parte puedes controlar a través de botones las interacciones del centro multimedia."
@@ -16,6 +16,26 @@ st.markdown(
 )
 st.markdown("---")
 
+page_style = """
+<style>
+/* Fondo principal */
+[data-testid="stAppViewContainer"] {
+    background-color: #5697d5;
+}
+
+/* Fondo del sidebar */
+[data-testid="stSidebar"] {
+    background-color: #9fcefb;
+}
+
+/* Color de todos los textos */
+[data-testid="stMarkdownContainer"] {
+    color: #121314;
+}
+</style>
+"""
+
+st.markdown(page_style, unsafe_allow_html=True)
 # Variables
 values = 0.0
 act1 = "OFF"
