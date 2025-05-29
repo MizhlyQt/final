@@ -7,7 +7,7 @@ from PIL import Image
 
 st.set_page_config(page_title="Control MQTT", page_icon="💡", layout="centered")
 
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Panel de Control del centro multimedial 🎭 </h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #ffffff;'>Panel de Control del centro multimedial 🎭 </h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size: 16px;'>"
     "En esta parte puedes controlar a través de botones las interacciones del centro multimedia."
