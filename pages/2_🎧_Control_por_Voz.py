@@ -38,7 +38,7 @@ page_style = """
 
 /* Color de todos los textos */
 [data-testid="stMarkdownContainer"] {
-    color: #000000;
+    color: #ffffff;
 }
 </style>
 """
@@ -46,8 +46,8 @@ page_style = """
 st.markdown(page_style, unsafe_allow_html=True)
 
 # Título principal
-st.title("INTERFACES MULTIMODALES")
-st.subheader("CONTROL POR VOZ")
+st.title("Control por Voz 🔊")
+
 
 st.markdown("""
 **Instrucciones**  
