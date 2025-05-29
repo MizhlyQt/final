@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Centro de Entretenimiento Inteligente")
+st.set_page_config(page_title="Centro Multimedial")
 
 page_style = """
 <style>
