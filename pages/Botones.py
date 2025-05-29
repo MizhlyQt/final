@@ -3,7 +3,7 @@ import time
 import streamlit as st
 import json
 import platform
-
+from PIL import Image
 
 st.set_page_config(page_title="Control MQTT", page_icon="💡", layout="centered")
 
@@ -52,7 +52,9 @@ with st.container():
             st.success("Comando enviado: Encender luces")
         else:
             st.write("")
-        st.image("https://png.pngtree.com/png-vector/20220903/ourmid/pngtree-shining-bright-light-bulb-png-image_6136095.png", caption="Luces encendidas", width=100)
+
+        image1 = Image.open("prendidas.png")
+        st.image(image1, caption="Luces encendidas", width=100)
 
     with col2:
         if st.button('🔌 Apagar luces'):
@@ -65,7 +67,9 @@ with st.container():
             st.success("Comando enviado: Apagar luces")
         else:
             st.write("")
-        st.image("https://png.pngtree.com/png-clipart/20201216/original/pngtree-flat-light-bulb-turn-off-isolated-vector-png-image_5692256.jpg", caption="Luces apagadas", width=100)
+
+        image2 = Image.open("Apagadas.png")
+        st.image(image2, caption="Luces apagadas", width=100)
 
     with col3:
         if st.button('🎵 Escuchar música'):
@@ -76,9 +80,8 @@ with st.container():
             message = json.dumps({"Act1": act1})
             ret = client1.publish("casa_inteligente", "escuchar La Musica")
             st.success("Comando enviado: Reproducir música")
-
         else:
             st.write("")
-        st.image("https://cpng.pikpng.com/pngl/s/448-4485000_recorder-boombox-videocassette-transprent-png-free-illustration-clipart.png", caption="Reproducir música", width=100)
 
-
+        image3 = Image.open("musica.png")
+        st.image(image3, caption="Reproducir música", width=100)
